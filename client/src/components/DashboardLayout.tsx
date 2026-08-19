@@ -57,25 +57,40 @@ export default function DashboardLayout({
     return <DashboardLayoutSkeleton />
   }
 
-  if (!user) {
+  const [demoUser, setDemoUser] = useState<boolean>(() => {
+    return typeof window !== "undefined" && window.location.hostname.includes("github.io");
+  });
+
+  const activeUser = user || (demoUser ? { id: 1, openId: "demo-policymaker", name: "BRICS Delegate (Demo)", email: "delegate@civicnexus.org", role: "policymaker" as const, loginMethod: "oauth", createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() } : null);
+
+  if (!activeUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-6">
-            <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Sign in to continue
+      <div className="flex items-center justify-center min-h-screen bg-neutral-50 p-4">
+        <div className="flex flex-col items-center gap-6 p-8 max-w-md w-full bg-white border border-black shadow-2xl">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="brand-mark text-2xl font-bold">CIVIC<span className="text-red-700">NEXUS</span></span>
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
+              Sign in to Policy Workspace
             </h1>
-            <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+            <p className="text-xs text-neutral-600 leading-5">
+              Access to the policy prioritization and moderation board requires role authentication.
             </p>
           </div>
-          <Button
-            onClick={() => startLogin()}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
+          <div className="w-full flex flex-col gap-3">
+            <Button
+              onClick={() => startLogin()}
+              className="w-full rounded-none bg-red-700 hover:bg-red-800 text-white font-medium"
+            >
+              Sign in via OAuth
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setDemoUser(true)}
+              className="w-full rounded-none border-black hover:bg-neutral-100 font-medium text-xs"
+            >
+              🚀 Explore as Policy Reviewer (Live Demo)
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -89,7 +104,7 @@ export default function DashboardLayout({
         } as CSSProperties
       }
     >
-      <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
+      <DashboardLayoutContent activeUser={activeUser} setSidebarWidth={setSidebarWidth}>
         {children}
       </DashboardLayoutContent>
     </SidebarProvider>
@@ -97,15 +112,18 @@ export default function DashboardLayout({
 }
 
 type DashboardLayoutContentProps = {
+  activeUser: any;
   children: React.ReactNode;
   setSidebarWidth: (width: number) => void;
 };
 
 function DashboardLayoutContent({
+  activeUser,
   children,
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const user = activeUser;
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";

@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Router as WouterRouter, Switch } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -11,8 +12,11 @@ import PolicyDashboard from "./pages/PolicyDashboard";
 import RequestDetail from "./pages/RequestDetail";
 import SubmitRequest from "./pages/SubmitRequest";
 
-function Router() {
-  // make sure to consider if you need authentication for certain routes
+function isGitHubPages() {
+  return typeof window !== "undefined" && (window.location.hostname.includes("github.io") || window.location.hash.startsWith("#"));
+}
+
+function Routes() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
@@ -28,18 +32,24 @@ function Router() {
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+function Router() {
+  const useHash = isGitHubPages();
+  
+  if (useHash) {
+    return (
+      <WouterRouter hook={useHashLocation}>
+        <Routes />
+      </WouterRouter>
+    );
+  }
+
+  return <Routes />;
+}
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <Router />

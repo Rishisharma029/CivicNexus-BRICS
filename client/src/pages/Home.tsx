@@ -6,11 +6,16 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { ArrowUpRight, BrainCircuit, ChevronRight, Globe2, MapPinned, Scale, ShieldCheck, Sparkles, Sprout, UsersRound } from "lucide-react";
 import { Link } from "wouter";
 
+import { DEMO_PRIORITIES, DEMO_REQUESTS } from "@/lib/demoData";
+
 export default function Home() {
-  const dashboard = trpc.civic.publicDashboard.useQuery();
+  const dashboard = trpc.civic.publicDashboard.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
   const { user } = useAuth();
-  const requests = (dashboard.data?.requests ?? []) as MapRequest[];
-  const priorities = (dashboard.data?.priorities ?? []) as MapPriority[];
+  const requests = (dashboard.data?.requests?.length ? dashboard.data.requests : DEMO_REQUESTS) as MapRequest[];
+  const priorities = (dashboard.data?.priorities?.length ? dashboard.data.priorities : DEMO_PRIORITIES) as MapPriority[];
   const countryCount = new Set(requests.map(request => request.country)).size;
   return <div className="min-h-screen overflow-x-hidden bg-white text-black"><header className="sticky top-0 z-50 border-b border-black bg-white"><div className="page-grid flex h-16 items-center justify-between"><Link href="/" className="brand-mark">CIVIC<span>NEXUS</span></Link><nav className="hidden items-center gap-6 text-xs font-bold uppercase tracking-[.14em] md:flex"><a href="#how-it-works">How it works</a><a href="#signal-map">Signal map</a><Link href="/policy">Policy workspace</Link></nav><Link href="/submit"><Button className="rounded-none bg-red-700 text-xs uppercase tracking-[.12em] hover:bg-red-800">Submit a signal <ChevronRight /></Button></Link></div></header>
     <main><section className="page-grid grid min-h-[650px] items-end gap-10 border-b border-black py-14 lg:grid-cols-[1.25fr_.75fr] lg:py-20"><div><p className="section-kicker">BRICS civic intelligence / Digital Public Good</p><h1 className="mt-4 max-w-5xl text-5xl font-bold leading-[.88] tracking-[-.075em] sm:text-7xl lg:text-[5.8rem]">From the street-level signal to the policy table.</h1><p className="mt-7 max-w-2xl text-lg leading-8 text-neutral-700">CivicNexus turns multilingual citizen requests into structured, privacy-aware evidence that helps BRICS decision-makers locate infrastructure gaps, recognise cross-border patterns, and act with an auditable human review trail.</p><div className="mt-9 flex flex-wrap gap-3"><Link href="/submit"><Button className="rounded-none bg-red-700 px-6 hover:bg-red-800"><MapPinned /> Report an infrastructure gap</Button></Link><Link href="/farmer"><Button className="rounded-none bg-emerald-700 px-6 hover:bg-emerald-800"><Sprout /> Farmer advisory</Button></Link><Link href="/policy"><Button variant="outline" className="rounded-none border-black px-6"><BrainCircuit /> Explore policy signals</Button></Link></div></div><div className="relative border border-black bg-black p-6 text-white"><div className="absolute -top-4 -right-4 h-14 w-14 bg-red-700" /><p className="section-kicker !text-red-300">The public-interest promise</p><p className="mt-5 text-2xl font-bold leading-tight tracking-[-.04em]">AI proposes. People verify. Institutions decide.</p><div className="mt-9 grid grid-cols-2 gap-px bg-neutral-700">{[["6", "working languages"], ["5", "BRICS contexts"], ["4", "policy states"], ["0", "hidden scoring rules"]].map(([number, label]) => <div key={label} className="bg-black p-4"><strong className="text-3xl text-red-400">{number}</strong><span className="mt-1 block text-xs text-neutral-300">{label}</span></div>)}</div></div></section>
