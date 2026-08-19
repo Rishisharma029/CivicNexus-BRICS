@@ -6,17 +6,182 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { CheckCircle2, ClipboardCheck, ShieldAlert, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
-import { DEMO_REQUESTS } from "@/lib/demoData";
+import { DEMO_AUDIT_LOGS, DEMO_REQUESTS } from "@/lib/demoData";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const isDemo = typeof window !== "undefined" && window.location.hostname.includes("github.io");
   const canAccess = user?.role === "admin" || isDemo;
+  const [demoRequests, setDemoRequests] = useState<any[]>(DEMO_REQUESTS);
+  const [demoAuditLogs, setDemoAuditLogs] = useState<any[]>(DEMO_AUDIT_LOGS);
+
   const dashboard = trpc.civic.policy.dashboard.useQuery(undefined, { enabled: Boolean(canAccess && !isDemo) });
   const audit = trpc.civic.admin.audit.useQuery(undefined, { enabled: Boolean(canAccess && !isDemo) });
-  const update = trpc.civic.admin.updateRequestStatus.useMutation({ onSuccess: () => { dashboard.refetch(); audit.refetch(); toast.success("Moderation status updated with an audit record."); }, onError: error => toast.error(error.message) });
-  if (!loading && !canAccess) return <DashboardLayout><div className="grid min-h-[70vh] place-items-center border border-black bg-white p-8 text-center"><div><ShieldAlert className="mx-auto h-10 w-10 text-red-700" /><h1 className="mt-4 text-3xl font-bold tracking-[-.05em]">Administrator access only</h1><p className="mx-auto mt-3 max-w-xl text-neutral-600">Moderation, audit records, and role stewardship are intentionally limited to the platform owner or an assigned administrator.</p></div></div></DashboardLayout>;
-  const requests = dashboard.data?.requests?.length ? dashboard.data.requests : (DEMO_REQUESTS as any[]);
-  return <DashboardLayout><div className="min-h-screen bg-white text-black"><div className="mb-8 border-b border-black pb-6"><p className="section-kicker">Platform owner / moderation environment</p><h1 className="mt-2 text-4xl font-bold tracking-[-.06em]">Human oversight console</h1><p className="mt-3 max-w-3xl text-sm leading-6 text-neutral-600">AI recommendations remain reviewable rather than automatic. Every operational status change is recorded, and owner alerts are limited to high-urgency submissions and policy-brief readiness.</p></div><div className="grid gap-5 md:grid-cols-3"><div className="metric-card"><ClipboardCheck /><p>Queue</p><strong>{requests.filter(request => request.status === "submitted").length}</strong><span>Submitted signals awaiting review</span></div><div className="metric-card"><ShieldCheck /><p>AI checks</p><strong>{requests.filter(request => request.analysisState === "complete").length}</strong><span>Structured Gemini analyses complete</span></div><div className="metric-card"><CheckCircle2 /><p>Audit actions</p><strong>{audit.data?.length ?? 0}</strong><span>Immutable operational trace</span></div></div><NationalContextPanel /><section className="mt-9 grid gap-8 xl:grid-cols-[1.18fr_.82fr]"><div><div className="mb-3 border-b border-black pb-3"><p className="section-kicker">Moderation queue</p><h2 className="text-2xl font-bold tracking-[-.04em]">Review before policy escalation</h2></div><div className="divide-y divide-black border-y border-black">{requests.map(request => <article key={request.id} className="grid gap-4 p-4 sm:grid-cols-[1fr_auto]"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{categoryLabel(request.category)} signal</h3><span className={`status-badge ${STATUS_META[request.status].tone}`}>{STATUS_META[request.status].label}</span><span className="border border-black px-2 py-0.5 text-[10px] font-bold uppercase">{request.urgency}</span></div><p className="mt-2 text-sm text-neutral-600">{countryName(request.country)} · {request.locationLabel} · AI state: {request.analysisState}</p>{request.analysis ? <p className="mt-2 border-l-2 border-red-700 pl-3 text-xs leading-5 text-neutral-700">{request.analysis.summary}</p> : null}</div><div className="flex flex-wrap items-start gap-2">{request.status === "submitted" ? <Button onClick={() => update.mutate({ requestId: request.id, status: "reviewed", note: "Administrator reviewed visible signal metadata and AI trace." })} variant="outline" className="rounded-none border-black">Mark reviewed</Button> : null}{request.status === "reviewed" ? <Button onClick={() => update.mutate({ requestId: request.id, status: "prioritized", note: "Administrator approved advancement into policy prioritisation." })} className="rounded-none bg-red-700 hover:bg-red-800">Prioritize</Button> : null}{request.status === "prioritized" ? <Button onClick={() => update.mutate({ requestId: request.id, status: "actioned", note: "Administrator recorded actioned status; external implementation remains independently verified." })} variant="outline" className="rounded-none border-black">Record action</Button> : null}</div></article>)}</div></div><aside><div className="mb-3 border-b border-black pb-3"><p className="section-kicker">Audit trail</p><h2 className="text-2xl font-bold tracking-[-.04em]">Accountable by design</h2></div><div className="max-h-[620px] space-y-3 overflow-auto pr-2">{audit.data?.map(event => <article key={event.id} className="border border-black p-4"><p className="text-xs font-bold uppercase tracking-wider text-red-700">{event.action.replaceAll("_", " ")}</p><p className="mt-2 text-sm">{event.note ?? "No note recorded."}</p><p className="mt-3 text-[11px] text-neutral-500">{new Date(event.createdAt).toLocaleString()} · {event.entityType} #{event.entityId}</p></article>) ?? <p className="border border-dashed border-black p-4 text-sm text-neutral-500">Audit events appear as activity occurs.</p>}</div></aside></section></div></DashboardLayout>;
+  const update = trpc.civic.admin.updateRequestStatus.useMutation({
+    onSuccess: () => {
+      dashboard.refetch();
+      audit.refetch();
+      toast.success("Moderation status updated with an audit record.");
+    },
+    onError: error => toast.error(error.message),
+  });
+
+  const handleUpdateStatus = (requestId: number, newStatus: "reviewed" | "prioritized" | "actioned", note: string) => {
+    if (isDemo) {
+      setDemoRequests(prev => prev.map(r => r.id === requestId ? { ...r, status: newStatus } : r));
+      setDemoAuditLogs(prev => [
+        {
+          id: Date.now(),
+          action: `status_${newStatus}`,
+          note: `[Demo] ${note}`,
+          entityType: "request",
+          entityId: requestId,
+          createdAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      toast.success(`Signal #${requestId} status updated to ${newStatus}. Audit event recorded.`);
+      return;
+    }
+    update.mutate({ requestId, status: newStatus, note });
+  };
+
+  if (!loading && !canAccess) {
+    return (
+      <DashboardLayout>
+        <div className="grid min-h-[70vh] place-items-center border border-black bg-white p-8 text-center">
+          <div>
+            <ShieldAlert className="mx-auto h-10 w-10 text-red-700" />
+            <h1 className="mt-4 text-3xl font-bold tracking-[-.05em]">Administrator access only</h1>
+            <p className="mx-auto mt-3 max-w-xl text-neutral-600">
+              Moderation, audit records, and role stewardship are intentionally limited to the platform owner or an assigned administrator.
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const requests = dashboard.data?.requests?.length ? dashboard.data.requests : demoRequests;
+  const auditLogs = audit.data?.length ? audit.data : demoAuditLogs;
+
+  return (
+    <DashboardLayout>
+      <div className="min-h-screen bg-white text-black">
+        <div className="mb-8 border-b border-black pb-6">
+          <p className="section-kicker">Platform owner / moderation environment</p>
+          <h1 className="mt-2 text-4xl font-bold tracking-[-.06em]">Human oversight console</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-neutral-600">
+            AI recommendations remain reviewable rather than automatic. Every operational status change is recorded, and owner alerts are limited to high-urgency submissions and policy-brief readiness.
+          </p>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-3">
+          <div className="metric-card">
+            <ClipboardCheck />
+            <p>Queue</p>
+            <strong>{requests.filter((r: any) => r.status === "submitted").length}</strong>
+            <span>Submitted signals awaiting review</span>
+          </div>
+          <div className="metric-card">
+            <ShieldCheck />
+            <p>AI checks</p>
+            <strong>{requests.filter((r: any) => r.analysisState === "complete").length}</strong>
+            <span>Structured Gemini analyses complete</span>
+          </div>
+          <div className="metric-card">
+            <CheckCircle2 />
+            <p>Audit actions</p>
+            <strong>{auditLogs.length}</strong>
+            <span>Immutable operational trace</span>
+          </div>
+        </div>
+
+        <NationalContextPanel />
+
+        <section className="mt-9 grid gap-8 xl:grid-cols-[1.18fr_.82fr]">
+          <div>
+            <div className="mb-3 border-b border-black pb-3">
+              <p className="section-kicker">Moderation queue</p>
+              <h2 className="text-2xl font-bold tracking-[-.04em]">Review before policy escalation</h2>
+            </div>
+            <div className="divide-y divide-black border-y border-black">
+              {requests.map((request: any) => {
+                const statusMeta = STATUS_META[request.status as keyof typeof STATUS_META] ?? STATUS_META.submitted;
+                return (
+                  <article key={request.id} className="grid gap-4 p-4 sm:grid-cols-[1fr_auto]">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-bold">{categoryLabel(request.category)} signal</h3>
+                        <span className={`status-badge ${statusMeta.tone}`}>{statusMeta.label}</span>
+                        <span className="border border-black px-2 py-0.5 text-[10px] font-bold uppercase">{request.urgency}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-neutral-600">
+                        {countryName(request.country)} · {request.locationLabel} · AI state: {request.analysisState}
+                      </p>
+                      {request.analysis ? (
+                        <p className="mt-2 border-l-2 border-red-700 pl-3 text-xs leading-5 text-neutral-700">
+                          {request.analysis.summary}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap items-start gap-2">
+                      {request.status === "submitted" ? (
+                        <Button
+                          onClick={() => handleUpdateStatus(request.id, "reviewed", "Administrator reviewed visible signal metadata and AI trace.")}
+                          variant="outline"
+                          className="rounded-none border-black"
+                        >
+                          Mark reviewed
+                        </Button>
+                      ) : null}
+                      {request.status === "reviewed" ? (
+                        <Button
+                          onClick={() => handleUpdateStatus(request.id, "prioritized", "Administrator approved advancement into policy prioritisation.")}
+                          className="rounded-none bg-red-700 hover:bg-red-800 text-white"
+                        >
+                          Prioritize
+                        </Button>
+                      ) : null}
+                      {request.status === "prioritized" ? (
+                        <Button
+                          onClick={() => handleUpdateStatus(request.id, "actioned", "Administrator recorded actioned status; external implementation remains independently verified.")}
+                          variant="outline"
+                          className="rounded-none border-black"
+                        >
+                          Record action
+                        </Button>
+                      ) : null}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <aside>
+            <div className="mb-3 border-b border-black pb-3">
+              <p className="section-kicker">Audit trail</p>
+              <h2 className="text-2xl font-bold tracking-[-.04em]">Accountable by design</h2>
+            </div>
+            <div className="max-h-[620px] space-y-3 overflow-auto pr-2">
+              {auditLogs.map((event: any) => (
+                <article key={event.id} className="border border-black p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-red-700">
+                    {event.action.replaceAll("_", " ")}
+                  </p>
+                  <p className="mt-2 text-sm">{event.note ?? "No note recorded."}</p>
+                  <p className="mt-3 text-[11px] text-neutral-500">
+                    {new Date(event.createdAt).toLocaleString()} · {event.entityType} #{event.entityId}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </aside>
+        </section>
+      </div>
+    </DashboardLayout>
+  );
 }

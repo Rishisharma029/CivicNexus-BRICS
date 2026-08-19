@@ -1,11 +1,12 @@
 import type { MapPriority, MapRequest } from "@/components/RequestMap";
 
-export const DEMO_REQUESTS: MapRequest[] = [
+export const DEMO_REQUESTS: (MapRequest & { status: "submitted" | "reviewed" | "prioritized" | "actioned" })[] = [
   {
     id: 101,
     country: "IN",
     category: "water",
     urgency: "critical",
+    status: "reviewed",
     locationLabel: "Pune, Maharashtra, India",
     latitude: "18.5204",
     longitude: "73.8567",
@@ -21,6 +22,7 @@ export const DEMO_REQUESTS: MapRequest[] = [
     country: "IN",
     category: "agriculture",
     urgency: "high",
+    status: "prioritized",
     locationLabel: "Nashik Agricultural Belt, Maharashtra, India",
     latitude: "19.9975",
     longitude: "73.7898",
@@ -36,6 +38,7 @@ export const DEMO_REQUESTS: MapRequest[] = [
     country: "ZA",
     category: "water",
     urgency: "critical",
+    status: "submitted",
     locationLabel: "Gauteng / Johannesburg, South Africa",
     latitude: "-26.2041",
     longitude: "28.0473",
@@ -51,6 +54,7 @@ export const DEMO_REQUESTS: MapRequest[] = [
     country: "BR",
     category: "climate",
     urgency: "high",
+    status: "reviewed",
     locationLabel: "Belém, Pará, Brazil",
     latitude: "-1.4558",
     longitude: "-48.4902",
@@ -66,6 +70,7 @@ export const DEMO_REQUESTS: MapRequest[] = [
     country: "CN",
     category: "digital",
     urgency: "medium",
+    status: "submitted",
     locationLabel: "Chengdu Rural Fringe, Sichuan, China",
     latitude: "30.5728",
     longitude: "104.0668",
@@ -81,6 +86,7 @@ export const DEMO_REQUESTS: MapRequest[] = [
     country: "RU",
     category: "energy",
     urgency: "high",
+    status: "actioned",
     locationLabel: "Kazan District, Tatarstan, Russia",
     latitude: "55.7963",
     longitude: "49.1088",
@@ -91,6 +97,13 @@ export const DEMO_REQUESTS: MapRequest[] = [
       confidence: 92,
     },
   },
+];
+
+export const DEMO_AUDIT_LOGS = [
+  { id: 1, action: "status_updated", note: "Moderation approved advancement of Pune Water Signal to reviewed status.", entityType: "request", entityId: 101, createdAt: new Date(Date.now() - 3600000).toISOString() },
+  { id: 2, action: "policy_matrix_indexed", note: "Nashik Agricultural Belt signal included in BRICS Agriculture Programme.", entityType: "priority", entityId: 2, createdAt: new Date(Date.now() - 7200000).toISOString() },
+  { id: 3, action: "signal_created", note: "Citizen signal logged via authenticated portal.", entityType: "request", entityId: 103, createdAt: new Date(Date.now() - 10800000).toISOString() },
+  { id: 4, action: "brief_generated", note: "Executive evidence brief compiled and ready for multilateral review.", entityType: "brief", entityId: 1, createdAt: new Date(Date.now() - 14400000).toISOString() },
 ];
 
 export const DEMO_FULL_PRIORITIES = [
