@@ -60,16 +60,45 @@ export function useAuth(options?: UseAuthOptions) {
     }
   }, [logoutMutation, utils]);
 
+  const isDemoHost = typeof window !== "undefined" && (
+    window.location.hostname.includes("github.io") ||
+    localStorage.getItem("civicnexus-demo-mode") === "true"
+  );
+
+  const [demoActive, setDemoActive] = useState<boolean>(() => isDemoHost);
+
+  const enableDemoMode = useCallback(() => {
+    localStorage.setItem("civicnexus-demo-mode", "true");
+    setDemoActive(true);
+  }, []);
+
   const state = useMemo(() => {
     localStorage.setItem(
       "app-runtime-user-info",
       JSON.stringify(meQuery.data)
     );
+
+    const demoUser = demoActive ? {
+      id: 1,
+      openId: "demo-brics-user",
+      name: "BRICS Delegate (Demo Mode)",
+      email: "delegate@civicnexus.org",
+      role: "admin" as const,
+      loginMethod: "oauth",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastSignedIn: new Date(),
+    } : null;
+
+    const activeUser = meQuery.data ?? demoUser;
+
     return {
-      user: meQuery.data ?? null,
-      loading: (meQuery.isLoading && !sessionLookupTimedOut) || logoutMutation.isPending,
+      user: activeUser,
+      loading: (meQuery.isLoading && !sessionLookupTimedOut && !demoActive) || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
-      isAuthenticated: Boolean(meQuery.data),
+      isAuthenticated: Boolean(activeUser),
+      isDemoMode: Boolean(demoActive && !meQuery.data),
+      enableDemoMode,
     };
   }, [
     meQuery.data,
@@ -78,6 +107,8 @@ export function useAuth(options?: UseAuthOptions) {
     logoutMutation.error,
     logoutMutation.isPending,
     sessionLookupTimedOut,
+    demoActive,
+    enableDemoMode,
   ]);
 
   useEffect(() => {

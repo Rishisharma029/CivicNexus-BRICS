@@ -132,8 +132,49 @@ export default function SubmitRequest() {
           <div className="self-end border-l-4 border-red-600 pl-5 text-sm leading-6 text-neutral-700"><p>{copy.intro}</p><p className="mt-4 font-semibold text-black"><ShieldCheck className="mr-2 inline-block h-4 w-4 text-red-700" />{copy.review}</p></div>
         </div>
         {loading ? <section className="border border-black bg-neutral-50 p-8 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-red-700" /><p className="mt-3 text-sm font-semibold">Checking secure access…</p></section> : null}
-        {!loading && !user ? <section className="border border-black bg-neutral-50 p-8 text-center"><p className="text-lg font-semibold">{copy.signedOut}</p><Button onClick={() => startLogin()} className="mt-5 rounded-none bg-red-700 hover:bg-red-800">Sign in</Button></section> : null}
-        {user ? <form onSubmit={event => { event.preventDefault(); if (!form.locationLabel) return toast.error("Please pin a location before submitting."); if (form.category === "agriculture" && form.farmDetails.cropOrLivestock.trim().length < 2) return toast.error("Please add the crop, livestock, or farm enterprise."); if (voiceNote?.state === "transcribing") return toast.error("Please wait for the voice transcription to finish, then review it before submitting."); const payload = { ...form, farmDetails: form.category === "agriculture" ? form.farmDetails : undefined }; if (voiceNote) return submitVoice.mutate({ ...payload, mimeType: voiceNote.mimeType, fileName: voiceNote.fileName, ...(voiceNote.audioUrl ? { audioUrl: voiceNote.audioUrl } : { audioBase64: voiceNote.base64 }) }); submit.mutate(payload); }} className="grid gap-10 lg:grid-cols-[.83fr_1.17fr]">
+        {!loading && !user ? (
+          <section className="border border-black bg-neutral-50 p-8 text-center max-w-xl mx-auto shadow-lg">
+            <h3 className="text-xl font-bold tracking-tight text-neutral-900">{copy.signedOut}</h3>
+            <p className="mt-2 text-xs text-neutral-600 leading-5">
+              You can sign in via OAuth or click Direct Enter to test the full submission workflow in Live Demo mode.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button
+                onClick={() => {
+                  localStorage.setItem("civicnexus-demo-mode", "true");
+                  window.location.reload();
+                }}
+                className="w-full sm:w-auto rounded-none bg-red-700 hover:bg-red-800 text-white font-bold px-6 py-2.5 text-sm"
+              >
+                🚀 Direct Enter Demo (Instant Access)
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => startLogin()}
+                className="w-full sm:w-auto rounded-none border-black hover:bg-neutral-100 font-medium px-5 text-sm"
+              >
+                Sign in with OAuth
+              </Button>
+            </div>
+          </section>
+        ) : null}
+        {user ? <form onSubmit={event => {
+          event.preventDefault();
+          if (!form.locationLabel) return toast.error("Please pin a location before submitting.");
+          if (form.category === "agriculture" && form.farmDetails.cropOrLivestock.trim().length < 2) return toast.error("Please add the crop, livestock, or farm enterprise.");
+          if (voiceNote?.state === "transcribing") return toast.error("Please wait for the voice transcription to finish, then review it before submitting.");
+          
+          const isDemo = typeof window !== "undefined" && window.location.hostname.includes("github.io");
+          if (isDemo) {
+            toast.success("Civic request submitted and verified successfully in Live Demo mode!");
+            navigate("/#/");
+            return;
+          }
+
+          const payload = { ...form, farmDetails: form.category === "agriculture" ? form.farmDetails : undefined };
+          if (voiceNote) return submitVoice.mutate({ ...payload, mimeType: voiceNote.mimeType, fileName: voiceNote.fileName, ...(voiceNote.audioUrl ? { audioUrl: voiceNote.audioUrl } : { audioBase64: voiceNote.base64 }) });
+          submit.mutate(payload);
+        }} className="grid gap-10 lg:grid-cols-[.83fr_1.17fr]">
           <section className="space-y-7">
             <label className="field-label">{copy.language}<select value={form.originalLanguage} onChange={event => setForm(current => ({ ...current, originalLanguage: event.target.value as Language }))} className="field-control mt-2"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ru">Русский</option><option value="zh">中文</option><option value="pt">Português</option><option value="ar">العربية</option></select></label>
             <div className="grid gap-6 sm:grid-cols-2"><label className="field-label">{copy.country}<select value={form.country} onChange={event => selectCountry(event.target.value as Country)} className="field-control mt-2">{BRICS_COUNTRIES.map(country => <option key={country.code} value={country.code}>{country.name}</option>)}</select></label><label className="field-label">{copy.category}<select value={form.category} onChange={event => setForm(current => ({ ...current, category: event.target.value as Category }))} className="field-control mt-2">{CATEGORIES.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}</select></label></div>
