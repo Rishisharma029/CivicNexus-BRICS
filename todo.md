@@ -1,0 +1,52 @@
+# Project TODO
+
+- [x] Create a complete data model for requests, AI analyses, translations, policy priorities, briefs, audit events, and country context.
+- [x] Implement role-based routes and permissions for citizens, policymakers, and administrators.
+- [x] Build a multilingual citizen request form for English, Hindi, Russian, Chinese, Portuguese, and Arabic.
+- [x] Add category selection, urgency controls, accessible form validation, and precise Google Maps location pinning.
+- [x] Persist citizen requests and support the exact status labels: submitted, reviewed, prioritized, and actioned.
+- [x] Integrate a Google AI-compatible LLM workflow for classification, sentiment, urgency assessment, duplicate detection, and cross-border pattern analysis.
+- [x] Generate and retain translations of submissions and AI summaries across all six supported languages.
+- [x] Create a transparent AI-analysis panel showing evidence, confidence, grouping, and human-review notes.
+- [x] Build an interactive geospatial dashboard with request markers, clustering, heatmap-style density views, country filters, and cross-border corridor views.
+- [x] Build a policymaker dashboard with ranked infrastructure priorities, impact scores, alignment indicators, and AI-generated evidence briefs.
+- [x] Build a one-click AI policy brief generator with a downloadable PDF export.
+- [x] Build an administrator moderation queue with review, status-transition, and audit-trail controls.
+- [x] Add owner-only notifications for high-urgency requests and AI brief readiness.
+- [x] Source and document realistic, properly attributed public-data context for the prototype.
+- [x] Apply the specified International Typographic Style with an asymmetric grid, white canvas, red accents, black typography, and responsive accessibility.
+- [x] Add Vitest coverage for policy scoring, status transitions, permissions, and AI-output validation.
+- [x] Verify the prototype visually at desktop and mobile breakpoints and resolve errors found in logs.
+- [x] Prepare a public GitHub-ready repository, concise project description, deployment guidance, pitch-deck content, and a 3–5 minute demo narrative.
+- [x] Audit the system against the exact challenge requirement for voice, text, and messaging-app request intake.
+- [x] Add voice-note capture and secure speech-to-text ingestion for citizen infrastructure requests.
+- [x] Add a messaging-app-compatible intake adapter with a documented webhook-ready request contract.
+- [x] Add an attributed national-context layer for demographic indicators, infrastructure indices, and public investment-plan records.
+- [x] Combine citizen signals with national-context records in transparent demand-hotspot and project-recommendation scoring.
+- [x] Verify all required challenge flows and publish a feature-by-feature compliance report.
+- [x] Add national-context explanation or weighting to demand-hotspot visualisation so map interpretation clearly combines civic and contextual evidence.
+- [ ] Complete live end-to-end verification for voice transcription, authenticated messaging ingestion, and national-context ingestion affecting priority outputs.
+- [ ] Perform final live-provider smoke checks with a consented voice sample, an approved messaging-provider account, and the administrator World Bank sync before a production pilot.
+- [x] Remove blocking AI analysis from the citizen submission request so a valid report is persisted and acknowledged immediately.
+- [x] Add a clear deferred-analysis state and a citizen-visible retry path for safe AI enrichment.
+- [x] Verify the submit interaction completes promptly without waiting for model translation or policy-priority generation.
+- [x] Remove blocking Gemini drafting and translation from the policy-brief creation action.
+- [x] Create an immediate evidence-backed policy brief with optional AI refinement and translation available afterward.
+- [x] Verify that generating and exporting a policy brief remains responsive for policymakers.
+- [ ] Perform a manual policymaker UI click-through that creates an instant evidence brief and exports its PDF in the updated workflow.
+- [x] Add one integrated automated lifecycle test covering instant brief creation followed by PDF export availability.
+- [x] Remove the slow optional AI-refinement control from the primary policy-brief panel.
+- [x] Keep the main policymaker brief experience limited to instant creation, review, and PDF export.
+- [x] Verify the streamlined brief panel has no blocking Gemini action exposed to judges.
+- [x] Copy the current CivicNexus project into the user's connected local development directory without overwriting unrelated local work.
+- [x] Verify that the local handoff contains source code, documentation, migrations, and test files.
+- [x] Add agriculture and farming as a first-class BRICS citizen-request category with farm-specific fields.
+- [x] Create a multilingual AI farmer-advisory workflow for crop, pest, irrigation, soil, and market-access concerns with clear safety boundaries.
+- [x] Add attributable agricultural context records and transparent farm-priority scoring.
+- [x] Build farmer and policymaker interfaces for agricultural advisories, local aggregation, and public-interest oversight.
+- [x] Copy the latest Farmer Advisory implementation into the user's local development directory without overwriting unrelated work.
+- [x] Verify the local handoff contains the farmer route, agricultural form changes, farmer-advisory tests, migration, and documentation.
+- [x] Repair the voice-report interaction with an explicit stop, automatic transcription into the form, a visible transcript-review state, and an unambiguous final submit action.
+- [x] Compare the full tracked source inventory with the user's local CivicNexus folder and safely refresh every missing or outdated project file.
+- [ ] Run and capture a successful full source-versus-local integrity audit covering all tracked project files, with final audited, refreshed, and verified counts.
+- [ ] Generate a source checksum manifest and verify the laptop folder against it without relying on blocked mounted-folder scans.

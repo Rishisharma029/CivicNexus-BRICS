@@ -1,0 +1,1 @@
+ALTER TABLE `contentTranslations` MODIFY COLUMN `entityType` enum('request','analysis','brief','advisory') NOT NULL;
