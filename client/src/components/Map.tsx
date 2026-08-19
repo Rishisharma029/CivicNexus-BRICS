@@ -80,6 +80,7 @@ import { AlertTriangle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePersistFn } from "@/hooks/usePersistFn";
 import { cn } from "@/lib/utils";
+import { InteractiveCivicMap } from "@/components/InteractiveCivicMap";
 
 declare global {
   interface Window {
@@ -160,10 +161,18 @@ export function MapView({
     init();
   }, [init]);
 
+  if (mapError) {
+    return (
+      <InteractiveCivicMap
+        className={className}
+        interactive
+      />
+    );
+  }
+
   return (
     <div className={cn("relative w-full h-[500px]", className)}>
       <div ref={mapContainer} className="h-full w-full" />
-      {mapError ? <div className="absolute inset-0 grid place-items-center bg-neutral-100 p-6 text-center"><div><AlertTriangle className="mx-auto h-6 w-6 text-red-700" /><p className="mt-3 text-sm font-bold">Map layer is temporarily unavailable</p><p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-neutral-600">The civic workflow remains available. Try again shortly or enter the location details manually.</p></div></div> : null}
     </div>
   );
 }

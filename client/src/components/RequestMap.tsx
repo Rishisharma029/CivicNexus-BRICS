@@ -53,6 +53,9 @@ function clusterElement(count: number) {
   return marker;
 }
 
+import { InteractiveCivicMap } from "@/components/InteractiveCivicMap";
+import { useState } from "react";
+
 export default function RequestMap({
   requests,
   priorities,
@@ -72,6 +75,7 @@ export default function RequestMap({
   onLocationPick?: (point: { lat: number; lng: number; label: string }) => void;
   onMapError?: () => void;
 }) {
+  const [hasMapError, setHasMapError] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
   const overlayRef = useRef<MapOverlay[]>([]);
   const filteredRequests = useMemo(() => (requests ?? []).filter(request => !selectedCountry || request.country === selectedCountry), [requests, selectedCountry]);
@@ -142,6 +146,20 @@ export default function RequestMap({
     return () => overlayRef.current.forEach(detachOverlay);
   }, [filteredRequests, priorities, showCorridors, showHeatmap, interactive]);
 
+  if (hasMapError) {
+    return (
+      <InteractiveCivicMap
+        requests={requests}
+        priorities={priorities}
+        selectedCountry={selectedCountry}
+        showHeatmap={showHeatmap}
+        showCorridors={showCorridors}
+        interactive={interactive}
+        onLocationPick={onLocationPick}
+      />
+    );
+  }
+
   return (
     <MapView
       className="h-[430px] border border-black"
@@ -163,7 +181,10 @@ export default function RequestMap({
           });
         }
       }}
-      onMapError={onMapError}
+      onMapError={() => {
+        setHasMapError(true);
+        onMapError?.();
+      }}
     />
   );
 }
