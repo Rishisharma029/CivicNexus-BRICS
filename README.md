@@ -5,19 +5,40 @@
 
 [![Build with AI](https://img.shields.io/badge/Hackathon-Code_for_Communities_2.0-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://hack2skill.com/event/codeforcommunities2)
 [![Google Gemini](https://img.shields.io/badge/Powered_By-Google_Gemini_AI-34A853?style=for-the-badge&logo=google-gemini&logoColor=white)](https://ai.google.dev/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-GitHub_Pages-EA4335?style=for-the-badge&logo=githubpages&logoColor=white)](https://rishisharma029.github.io/CivicNexus-BRICS/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![tRPC](https://img.shields.io/badge/tRPC-v11-2596BE?style=for-the-badge&logo=trpc&logoColor=white)](https://trpc.io/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+<br />
+
+> ### 🌐 **[✨ Launch Interactive Live Demo on GitHub Pages →](https://rishisharma029.github.io/CivicNexus-BRICS/)**
+> **Production Deployment:** [`https://rishisharma029.github.io/CivicNexus-BRICS/`](https://rishisharma029.github.io/CivicNexus-BRICS/)
 
 <p align="center">
   <b>Bridging grassroots citizen signals, rural agricultural advisory, and cross-border public policy synthesis across BRICS nations using multimodal Google AI, live World Bank contextual intelligence, and automated evidence briefs.</b>
 </p>
 
-[Explore Live Map](#-core-capabilities) • [Architecture](#-system-architecture) • [Hackathon Tracks](#-hackathon-tracks-coverage) • [Quick Start](#-getting-started) • [API Reference](#-api-architecture)
+[🚀 Live Demo](https://rishisharma029.github.io/CivicNexus-BRICS/) • [Explore Live Map](#-core-capabilities) • [Architecture](#-system-architecture) • [Hackathon Tracks](#-hackathon-tracks-coverage) • [Quick Start](#-getting-started) • [API Reference](#-api-architecture)
 
 ---
+
+</div>
+
+## 🚀 Interactive Live Demo
+
+Experience the full interactive frontend running live on GitHub Pages:
+
+<div align="center">
+
+| Module | Direct Live URL | Key Features |
+| :--- | :--- | :--- |
+| 🗺️ **Public Demand Map** | [**Launch Map View**](https://rishisharma029.github.io/CivicNexus-BRICS/) | Real-time geospatial request markers, density halos, national context weighting, and cross-border corridors |
+| 🌾 **Farmer Advisory Module** | [**Launch Farmer Advisory**](https://rishisharma029.github.io/CivicNexus-BRICS/) | Rural agronomy triage, crop & soil diagnostics, non-chemical safety cautions, 6-language translations |
+| 🎙️ **Multilingual Citizen Intake** | [**Launch Citizen Intake**](https://rishisharma029.github.io/CivicNexus-BRICS/) | Voice recording with Whisper transcription, accessible form validation, and Google Maps pin drop |
+| 📑 **Policy Evidence Dashboard** | [**Launch Policy Dashboard**](https://rishisharma029.github.io/CivicNexus-BRICS/) | Multi-nation composite priority ranking, World Bank indicators alignment, and instant PDF brief exporter |
+| 🛡️ **Moderation & Admin Panel** | [**Launch Admin Panel**](https://rishisharma029.github.io/CivicNexus-BRICS/) | Audit trail inspection, World Bank indicator sync, and public investment plan recording |
 
 </div>
 
