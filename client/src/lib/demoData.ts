@@ -106,6 +106,15 @@ export const DEMO_AUDIT_LOGS = [
   { id: 4, action: "brief_generated", note: "Executive evidence brief compiled and ready for multilateral review.", entityType: "brief", entityId: 1, createdAt: new Date(Date.now() - 14400000).toISOString() },
 ];
 
+export const DEMO_WORLD_BANK_RECORDS = [
+  { id: 1, country: "IN", category: "water", contextType: "world_bank_indicator", indicatorCode: "SH.H2O.SMDW.ZS", label: "Safely managed drinking water services (% of population)", value: "72.4", unit: "%", dataPeriod: "2023", relevanceWeight: 85, sourceUrl: "https://data.worldbank.org/indicator/SH.H2O.SMDW.ZS?locations=IN", notes: "Attributed from World Bank Open Data (India)" },
+  { id: 2, country: "IN", category: "agriculture", contextType: "world_bank_indicator", indicatorCode: "AG.LND.AGRI.ZS", label: "Agricultural land (% of land area)", value: "60.4", unit: "%", dataPeriod: "2023", relevanceWeight: 80, sourceUrl: "https://data.worldbank.org/indicator/AG.LND.AGRI.ZS?locations=IN", notes: "Attributed from World Bank Open Data (India)" },
+  { id: 3, country: "ZA", category: "water", contextType: "world_bank_indicator", indicatorCode: "SH.H2O.SMDW.ZS", label: "Safely managed drinking water services (% of population)", value: "79.1", unit: "%", dataPeriod: "2023", relevanceWeight: 82, sourceUrl: "https://data.worldbank.org/indicator/SH.H2O.SMDW.ZS?locations=ZA", notes: "Attributed from World Bank Open Data (South Africa)" },
+  { id: 4, country: "BR", category: "climate", contextType: "world_bank_indicator", indicatorCode: "ER.FSH.AQUA.MT", label: "Aquaculture production (metric tons)", value: "624300", unit: "MT", dataPeriod: "2022", relevanceWeight: 75, sourceUrl: "https://data.worldbank.org/indicator/ER.FSH.AQUA.MT?locations=BR", notes: "Attributed from World Bank Open Data (Brazil)" },
+  { id: 5, country: "CN", category: "digital", contextType: "world_bank_indicator", indicatorCode: "IT.NET.USER.ZS", label: "Individuals using the Internet (% of population)", value: "76.4", unit: "%", dataPeriod: "2023", relevanceWeight: 90, sourceUrl: "https://data.worldbank.org/indicator/IT.NET.USER.ZS?locations=CN", notes: "Attributed from World Bank Open Data (China)" },
+  { id: 6, country: "RU", category: "energy", contextType: "world_bank_indicator", indicatorCode: "EG.ELC.ACCS.ZS", label: "Access to electricity (% of population)", value: "100.0", unit: "%", dataPeriod: "2023", relevanceWeight: 78, sourceUrl: "https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS?locations=RU", notes: "Attributed from World Bank Open Data (Russia)" },
+];
+
 export const DEMO_FULL_PRIORITIES = [
   {
     id: 1,
