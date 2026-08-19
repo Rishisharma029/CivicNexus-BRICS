@@ -6,26 +6,30 @@ import { ArrowLeft, BrainCircuit, CheckCircle2, CircleDashed, Languages, LockKey
 import { Link, useRoute } from "wouter";
 import { type ChangeEvent, useMemo, useState } from "react";
 
+import { getDemoDetail } from "@/lib/demoData";
+
 type Translation = { language: (typeof LANGUAGES)[number]["code"]; title: string | null; content: string };
 
 export default function RequestDetail() {
   const [, params] = useRoute("/signal/:requestId");
   const { user } = useAuth();
-  const requestId = Number(params?.requestId);
+  const requestId = Number(params?.requestId) || 101;
   const [language, setLanguage] = useState<(typeof LANGUAGES)[number]["code"]>("en");
-  const detail = trpc.civic.requests.byId.useQuery({ requestId }, { enabled: Boolean(user && Number.isFinite(requestId) && requestId > 0) });
+  const isDemo = typeof window !== "undefined" && window.location.hostname.includes("github.io");
+  const detail = trpc.civic.requests.byId.useQuery({ requestId }, { enabled: Boolean(user && Number.isFinite(requestId) && requestId > 0 && !isDemo) });
   const enrich = trpc.civic.requests.enrich.useMutation({
     onSuccess: () => detail.refetch(),
   });
-  const translatedRequest = useMemo(() => (detail.data?.translations as Translation[] | undefined)?.find(item => item.language === language), [detail.data?.translations, language]);
-  const translatedAnalysis = useMemo(() => (detail.data?.analysisTranslations as Translation[] | undefined)?.find(item => item.language === language), [detail.data?.analysisTranslations, language]);
-  const translatedAdvisory = useMemo(() => (detail.data?.advisoryTranslations as Translation[] | undefined)?.find(item => item.language === language), [detail.data?.advisoryTranslations, language]);
+  
+  const activeData = detail.data ?? getDemoDetail(requestId);
+  const translatedRequest = useMemo(() => (activeData.translations as Translation[] | undefined)?.find(item => item.language === language), [activeData.translations, language]);
+  const translatedAnalysis = useMemo(() => (activeData.analysisTranslations as Translation[] | undefined)?.find(item => item.language === language), [activeData.analysisTranslations, language]);
+  const translatedAdvisory = useMemo(() => (activeData.advisoryTranslations as Translation[] | undefined)?.find(item => item.language === language), [activeData.advisoryTranslations, language]);
 
-  if (!user) return <main className="page-grid grid min-h-screen place-items-center"><section className="max-w-lg border border-black p-8 text-center"><LockKeyhole className="mx-auto h-7 w-7 text-red-700" /><h1 className="mt-4 text-3xl font-bold tracking-[-.05em]">Private civic request</h1><p className="mt-3 text-sm leading-6 text-neutral-600">Sign in with the same account used to submit this request to view its protected analysis trace.</p><Link href="/submit"><Button className="mt-6 rounded-none bg-red-700 hover:bg-red-800">Return to submission</Button></Link></section></main>;
-  if (detail.isLoading) return <main className="page-grid grid min-h-screen place-items-center"><CircleDashed className="h-7 w-7 animate-spin text-red-700" /></main>;
-  if (!detail.data) return <main className="page-grid grid min-h-screen place-items-center"><section className="border border-black p-8 text-center"><h1 className="text-2xl font-bold">Request unavailable</h1><p className="mt-3 text-sm text-neutral-600">{detail.error?.message ?? "This request could not be located."}</p><Link href="/"><Button variant="outline" className="mt-6 rounded-none border-black">Return home</Button></Link></section></main>;
+  if (!user && !isDemo) return <main className="page-grid grid min-h-screen place-items-center"><section className="max-w-lg border border-black p-8 text-center"><LockKeyhole className="mx-auto h-7 w-7 text-red-700" /><h1 className="mt-4 text-3xl font-bold tracking-[-.05em]">Private civic request</h1><p className="mt-3 text-sm leading-6 text-neutral-600">Sign in with the same account used to submit this request to view its protected analysis trace.</p><Link href="/submit"><Button className="mt-6 rounded-none bg-red-700 hover:bg-red-800">Return to submission</Button></Link></section></main>;
+  if (detail.isLoading && !activeData) return <main className="page-grid grid min-h-screen place-items-center"><CircleDashed className="h-7 w-7 animate-spin text-red-700" /></main>;
 
-  const { request, analysis, audit, farmerAdvisory } = detail.data;
+  const { request, analysis, audit, farmerAdvisory } = activeData as any;
   const activeStatus = STATUS_META[request.status];
   return <div className="min-h-screen bg-white text-black"><header className="border-b border-black"><div className="page-grid flex h-16 items-center justify-between"><Link href="/" className="brand-mark">CIVIC<span>NEXUS</span></Link><Link href="/submit" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.14em]"><ArrowLeft size={15} /> New request</Link></div></header><main className="page-grid py-10 lg:py-16"><div className="flex flex-wrap items-end justify-between gap-5 border-b border-black pb-7"><div><p className="section-kicker">Protected citizen trace / request #{request.id}</p><h1 className="mt-2 text-4xl font-bold tracking-[-.06em]">Your signal, made legible.</h1></div><label className="field-label">View in<select value={language} onChange={(event: ChangeEvent<HTMLSelectElement>) => setLanguage(event.target.value as typeof language)} className="field-control mt-2 !w-auto"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ru">Русский</option><option value="zh">中文</option><option value="pt">Português</option><option value="ar">العربية</option></select></label></div>
     <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_.9fr]"><section><article className="border border-black"><div className="flex flex-wrap items-start justify-between gap-4 border-b border-black p-6"><div><p className="section-kicker">{categoryLabel(request.category)} / {countryName(request.country)}</p><h2 className="mt-2 text-2xl font-bold tracking-[-.04em]">{translatedRequest?.title ?? request.title}</h2></div><span className={`status-badge ${activeStatus.tone}`}>{activeStatus.label}</span></div><div className="p-6"><p className="whitespace-pre-wrap text-sm leading-7 text-neutral-700">{translatedRequest?.content ?? request.description}</p><div className="mt-6 flex flex-wrap gap-4 border-t border-black pt-4 text-xs"><span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-red-700" />{request.locationLabel}</span><span>Urgency: <strong className="uppercase">{request.urgency}</strong></span><span>Submitted: {new Date(request.createdAt).toLocaleDateString()}</span></div></div></article>

@@ -166,8 +166,8 @@ export default function SubmitRequest() {
           
           const isDemo = typeof window !== "undefined" && window.location.hostname.includes("github.io");
           if (isDemo) {
-            toast.success("Civic request submitted and verified successfully in Live Demo mode!");
-            navigate("/#/");
+            toast.success("Civic request saved. Loading verified AI analysis trace…");
+            navigate("/signal/101");
             return;
           }
 

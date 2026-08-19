@@ -151,3 +151,84 @@ export const DEMO_FULL_PRIORITIES = [
 
 export const DEMO_PRIORITIES: MapPriority[] = DEMO_FULL_PRIORITIES;
 
+export function getDemoDetail(id: number) {
+  const req = DEMO_REQUESTS.find(r => r.id === id) ?? DEMO_REQUESTS[0];
+  return {
+    request: {
+      id: req.id,
+      userId: 1,
+      country: req.country,
+      category: req.category,
+      urgency: req.urgency,
+      title: req.id === 102 ? "Pest infestation and soil salinity stress in Nashik" : "Recurrent drinking water supply cuts in municipal zone",
+      description: req.id === 102 
+        ? "Farmers across the Nashik belt report unseasonal humidity causing fungal blights and pest attacks on tomato and onion crops. Soil salinity has increased after recent canal irrigation cycles."
+        : "Over 14 residential wards face erratic water tanker schedules and low pressure in main distribution lines during summer peak demand. Primary health clinic is forced to store water in unsealed containers.",
+      locationLabel: req.locationLabel,
+      latitude: req.latitude,
+      longitude: req.longitude,
+      channel: "web",
+      originalLanguage: "en",
+      status: "reviewed" as const,
+      analysisState: "complete",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    analysis: {
+      id: 1,
+      requestId: req.id,
+      summary: req.analysis?.summary ?? "Public infrastructure signal validated and categorized by Gemini AI.",
+      confidence: req.analysis?.confidence ?? 94,
+      urgencyScore: req.analysis?.urgencyScore ?? 88,
+      sentiment: "urgent",
+      impactStatement: "Affects over 12,000 residents and local smallholder agricultural units. High return on public remediation.",
+      crossBorderThemes: ["Water Security", "Climate Adaptation", "Agricultural Resilience", "Municipal Infrastructure"],
+      duplicateOfId: null,
+      rawOutput: "{}",
+      createdAt: new Date().toISOString(),
+    },
+    translations: [
+      { language: "en", title: req.id === 102 ? "Pest infestation and soil salinity stress in Nashik" : "Recurrent drinking water supply cuts in municipal zone", content: req.id === 102 ? "Farmers across the Nashik belt report unseasonal humidity causing fungal blights and pest attacks on tomato and onion crops." : "Over 14 residential wards face erratic water tanker schedules and low pressure in main distribution lines during summer peak demand." },
+      { language: "hi", title: req.id === 102 ? "नासिक में कीट प्रकोप और मिट्टी की लवणता" : "नगर निगम क्षेत्र में लगातार पेयजल आपूर्ति में बाधा", content: req.id === 102 ? "नासिक बेल्ट के किसानों ने टमाटर और प्याज की फसलों पर कवक और कीटों के हमले की सूचना दी है।" : "14 से अधिक आवासीय वार्डों में गर्मियों के दौरान पानी के टैंकरों की अनियमितता का सामना करना पड़ रहा है।" },
+      { language: "ru", title: "Перебои с водоснабжением в муниципальном районе", content: "Жители сообщают о перебоях в подаче питьевой воды и снижении давления в сети." },
+      { language: "zh", title: "市政供水中断及管网水压不足问题", content: "居民反映夏季用水高峰期供水不稳定，建议加快管道维护。" },
+      { language: "pt", title: "Interrupções no fornecimento de água potável", content: "Moradores relatam escassez de água e pressão insuficiente nas redes durante o verão." },
+      { language: "ar", title: "انقطاع إمدادات مياه الشرب في المنطقة البلدية", content: "أبلغ المواطنون عن تكرار انقطاع المياه في أوقات الذروة." },
+    ],
+    analysisTranslations: [
+      { language: "en", title: "AI Analysis", content: "High priority infrastructure requirement with severe community impact." },
+      { language: "hi", title: "एआई विश्लेषण", content: "गंभीर सामुदायिक प्रभाव वाला उच्च प्राथमिकता वाला बुनियादी ढाँचा अनुरोध।" },
+      { language: "ru", title: "ИИ-анализ", content: "Высокоприоритетный запрос на модернизацию инфраструктуры." },
+      { language: "zh", title: "AI 分析", content: "具有高度公共影响的优先基础设施需求。" },
+      { language: "pt", title: "Análise de IA", content: "Demanda de infraestrutura de alta prioridade com impacto comunitário." },
+      { language: "ar", title: "تحليل الذكاء الاصطناعي", content: "طلب بنية تحتية عالي الأولوية وله تأثير مجتمعي مباشر." },
+    ],
+    farmerAdvisory: req.category === "agriculture" || req.id === 102 ? {
+      id: 1,
+      requestId: req.id,
+      summary: "Integrated pest management and drainage guidance for horticultural crops.",
+      recommendedActions: [
+        "Improve furrow aeration and drainage to reduce fungal spread in waterlogged zones.",
+        "Apply neem-based organic bio-repellents during early morning hours.",
+        "Monitor soil moisture with tensiometer before next irrigation cycle."
+      ],
+      cautions: [
+        "Do not apply unprescribed chemical pesticides without local agronomist consultation.",
+        "Avoid overhead sprinkler irrigation during high humidity periods."
+      ],
+      escalation: "Escalate to District Krishi Vigyan Kendra (KVK) or Agronomy Extension Officer for lab soil testing.",
+      createdAt: new Date().toISOString(),
+    } : null,
+    advisoryTranslations: [
+      { language: "en", title: "Farmer Advisory", content: "Integrated pest management and drainage guidance for horticultural crops." },
+      { language: "hi", title: "किसान सलाह", content: "बागवानी फसलों के लिए एकीकृत कीट प्रबंधन और जल निकासी मार्गदर्शन।" },
+    ],
+    audit: [
+      { id: 1, action: "signal_created", note: "Signal captured via verified civic channel", entityType: "request", entityId: req.id, createdAt: new Date().toISOString() },
+      { id: 2, action: "ai_analysis_completed", note: "Gemini 2.5 structured analysis and multilanguage translation completed", entityType: "analysis", entityId: 1, createdAt: new Date().toISOString() },
+      { id: 3, action: "policy_matrix_indexed", note: "Indexed into cross-border BRICS demand registry", entityType: "priority", entityId: 1, createdAt: new Date().toISOString() },
+    ],
+  };
+}
+
+
